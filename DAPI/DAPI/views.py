@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import render_template
 from flask.json import jsonify
 from DAPI import app
-import pypyodbc
+import pyodbc as pypyodbc
 
 @app.route('/')
 @app.route('/home')
