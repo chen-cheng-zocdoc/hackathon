@@ -4,7 +4,9 @@ Routes and views for the flask application.
 
 from datetime import datetime
 from flask import render_template
+from flask.json import jsonify
 from DAPI import app
+import pypyodbc
 
 @app.route('/')
 @app.route('/home')
@@ -34,4 +36,20 @@ def about():
         title='About',
         year=datetime.now().year,
         message='Your application description page.'
+    )
+
+@app.route('/api/doctor/<person_id>')
+def get_doctor(person_id):
+    conn = pypyodbc.connect(driver='{SQL Server}', server='localhost', database='ZocData')
+
+    cur = conn.cursor()
+    cur.execute('select * from person where personId = %s' % person_id)
+    row = cur.fetchone()
+
+    return render_template(
+        'doctor.html',
+        title='Doctor Info',
+        year=datetime.now().year,
+        person_id=row[0],
+        name=row[2]+' '+row[3]+' '+row[4]
     )
