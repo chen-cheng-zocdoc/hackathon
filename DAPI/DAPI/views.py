@@ -43,13 +43,16 @@ def get_doctor(person_id):
     conn = pypyodbc.connect(driver='{SQL Server}', server='localhost', database='ZocData')
 
     cur = conn.cursor()
-    cur.execute('select * from person where personId = %s' % person_id)
+    cur.execute('select personId, firstName, lastName from person where personId = %s' % person_id)
     row = cur.fetchone()
 
-    return render_template(
-        'doctor.html',
-        title='Doctor Info',
-        year=datetime.now().year,
-        person_id=row[0],
-        name=row[2]+' '+row[3]+' '+row[4]
-    )
+    return jsonify(personId=row[0],
+                   firstName=row[1],
+                   lastName=row[2])
+    #return render_template(
+    #    'doctor.html',
+    #    title='Doctor Info',
+    #    year=datetime.now().year,
+    #    person_id=row[0],
+    #    name=row[2]+' '+row[3]+' '+row[4]
+    #)
