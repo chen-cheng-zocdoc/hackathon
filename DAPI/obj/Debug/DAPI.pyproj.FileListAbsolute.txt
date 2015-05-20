@@ -1,0 +1,13 @@
+C:\src\DAPI\DAPI\bin\Microsoft.PythonTools.WebRole.dll
+C:\src\DAPI\DAPI\obj\Debug\attach_server.py
+C:\src\DAPI\DAPI\obj\Debug\visualstudio_py_debugger.py
+C:\src\DAPI\DAPI\obj\Debug\visualstudio_py_repl.py
+C:\src\DAPI\DAPI\obj\Debug\visualstudio_py_util.py
+C:\src\DAPI\DAPI\obj\Debug\__init__.py
+C:\src\DAPI\DAPI\obj\Debug\__main__.py
+C:\src\DAPI\DAPI\bin\AzureSetup.cfg
+C:\src\DAPI\DAPI\bin\Microsoft.PythonTools.AzureSetup.exe
+C:\src\DAPI\DAPI\bin\Microsoft.PythonTools.AzureSetup.exe.config
+C:\src\DAPI\DAPI\bin\wfastcgi.py
+C:\src\DAPI\DAPI\obj\Debug\web.config
+C:\src\DAPI\DAPI\obj\Debug\web.debug.config
