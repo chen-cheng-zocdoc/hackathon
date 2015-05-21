@@ -31,6 +31,8 @@
     <Compile Include="runserver.py" />
     <Compile Include="DAPI\__init__.py" />
     <Compile Include="DAPI\views.py" />
+    <Compile Include="DAPI\persistence\__init__.py" />
+    <Compile Include="DAPI\persistence\db_doc.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DAPI\" />
@@ -39,8 +41,10 @@
     <Folder Include="DAPI\static\fonts\" />
     <Folder Include="DAPI\static\scripts\" />
     <Folder Include="DAPI\templates\" />
+    <Folder Include="DAPI\persistence\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DAPI\templates\DoctorInfo.html" />
     <Content Include="requirements.txt" />
     <Content Include="DAPI\static\content\bootstrap.css" />
     <Content Include="DAPI\static\content\bootstrap.min.css" />
