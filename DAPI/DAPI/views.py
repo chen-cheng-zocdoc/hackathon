@@ -46,13 +46,6 @@ def get_doctor(person_id):
         doctor = doc_db.get_doctor_by_person_id(person_id)
 
     except err:
-        print ('Failed to retrieve doctor information:\n %s' % err)
+        print ('Failed to retrieve doctor information.. :(')
 
     return jsonify(doctor)
-    #return render_template(
-    #    'doctor.html',
-    #    title='Doctor Info',
-    #    year=datetime.now().year,
-    #    person_id=row[0],
-    #    name=row[2]+' '+row[3]+' '+row[4]
-    #)
