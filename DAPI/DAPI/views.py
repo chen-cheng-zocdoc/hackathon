@@ -7,6 +7,7 @@ from flask import render_template
 from flask.json import jsonify
 from DAPI import app
 from DAPI.persistence.db_doc import DocDB
+from DAPI.persistence.db_sellability import SellDB
 
 @app.route('/')
 @app.route('/home')
@@ -49,3 +50,15 @@ def get_doctor(person_id):
         print ('Failed to retrieve doctor information.. :(')
 
     return jsonify(doctor)
+
+@app.route('/api/sellability/<who_id>')
+def get_sellability(who_id):
+
+    try:
+        sell_db = SellDB()
+        sellability = sell_db.get_sellability_by_who_id(who_id)
+
+    except err:
+        print ('Failed to retrieve sellability information.. :(')
+
+    return jsonify(sellability)
