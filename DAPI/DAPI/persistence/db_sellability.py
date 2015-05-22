@@ -92,6 +92,10 @@ class SellDB(object):
             else:
                 sell['CaresAboutOnlineReputation'] = 'N/A'  
 
+            # fix Vitals_NumReviews
+            if sell['Vitals_NumReviews']:
+                sell['Vitals_NumReviews'] = int(sell['Vitals_NumReviews'])
+
             results.append(sell)
 
         return results[0]
