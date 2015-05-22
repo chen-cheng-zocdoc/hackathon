@@ -168,4 +168,4 @@ class DocDB(object):
                     'Specialty': row[3]
                 })
 
-        return {'Doctors': doc_list}
+        return {'total': len(doc_list), 'Doctors': doc_list}
