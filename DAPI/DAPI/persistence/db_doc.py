@@ -12,11 +12,11 @@ class DocDB(object):
         doctor_query = """
             select p.PersonId, p.FirstName, p.LastName, oc.Value as Age, mrdv.Value as Specialty
             from Person p
-            inner join ObjectCharacteristic oc on oc.ObjectId = p.PersonId and oc.ObjectCharacteristicTypeId = 6523 and oc.ObjectCharacteristicStatusId = 5220 -- estimated current age
+            left join ObjectCharacteristic oc on oc.ObjectId = p.PersonId and oc.ObjectCharacteristicTypeId = 6523 and oc.ObjectCharacteristicStatusId = 5220 -- estimated current age
             inner join ObjectReferenceDataValue ordv on ordv.ObjectId = p.PersonId and ordv.ObjectReferenceDataTypeId = 25 and ordv.ObjectReferenceDataValueStatusId = 6197 -- estimated best specialty
             inner join MasterReferenceDataValue mrdv on mrdv.MasterReferenceDataValueId = ordv.MasterReferenceDataValueId
-            where p.PersonId = %s
-        """
+            where p.PersonId = {0}
+        """.format(person_id)
 
         practice_query = """
             select l.Address1 + ' ' + ISNULL(l.Address2, '') as Address, l.City, mrdv.Value as State, l.Zip
@@ -24,9 +24,9 @@ class DocDB(object):
             inner join PersonLocation pl on pl.PersonId = p.PersonId
             inner join Location l on l.LocationId = pl.LocationId
 			inner join MasterReferenceDataValue mrdv on mrdv.MasterReferenceDataValueId = l.StateId
-            where p.PersonId = %s
+            where p.PersonId = {0}
             and pl.PersonLocationStatusId = 6185
-        """
+        """.format(person_id)
 
         education_query = """
             select o.Name, mrdv.Value as Degree, pe.StartYear, pe.EndYear
@@ -34,26 +34,26 @@ class DocDB(object):
             inner join Education e on e.EducationId = pe.EducationId
             inner join Organization o on o.OrganizationId = e.OrganizationId
             inner join MasterReferenceDataValue mrdv on mrdv.MasterReferenceDataValueId = e.EducationDegreeId
-            where pe.PersonId = %s
-        """
+            where pe.PersonId = {0}
+        """.format(person_id)
 
         certificate_query = """
             select distinct c.Name
             from PersonCertification pc
             inner join Certification c on c.CertificationId = pc.CertificationId
-            where pc.PersonId = %s
-        """
+            where pc.PersonId = {0}
+        """.format(person_id)
 
         insurance_query = """
             select distinct ip.Name
             from PersonInsurancePlan pip
             inner join InsurancePlan ip on ip.InsurancePlanId = pip.InsurancePlanId
-            where pip.PersonId = %s
+            where pip.PersonId = {0}
             and ip.InsurancePlanStatusId = 9147 -- active
-        """
+        """.format(person_id)
 
         cur = self.conn.cursor()
-        cur.execute(doctor_query % person_id)
+        cur.execute(doctor_query)
         doctor = cur.fetchone()
 
         doc_dict = {
@@ -64,7 +64,7 @@ class DocDB(object):
             'Specialty': doctor[4]
         }
 
-        cur.execute(practice_query % person_id)
+        cur.execute(practice_query)
         rows = cur.fetchall()
 
         practices = []
@@ -79,7 +79,7 @@ class DocDB(object):
 
         doc_dict['Practices'] = practices
 
-        cur.execute(education_query % person_id)
+        cur.execute(education_query)
         rows = cur.fetchall()
 
         education = []
@@ -92,7 +92,7 @@ class DocDB(object):
 
         doc_dict['Education'] = education
 
-        cur.execute(certificate_query % person_id)
+        cur.execute(certificate_query)
         rows = cur.fetchall()
 
         certificates = []
@@ -104,7 +104,7 @@ class DocDB(object):
 
         doc_dict['Certificates'] = certificates
 
-        cur.execute(insurance_query % person_id)
+        cur.execute(insurance_query)
         rows = cur.fetchall()
 
         insurances = []
@@ -118,4 +118,54 @@ class DocDB(object):
 
         return doc_dict
 
+    def get_doctor_by_specialty_and_zip(self, specialty, zip):
+        """get a list of doctors for the given specialty and zip"""
+        if specialty and zip:
+            search_query = """
+                select distinct p.PersonId, p.FirstName, p.LastName, mrdv.Value
+                from Person p
+                inner join ObjectReferenceDataValue ordv on ordv.ObjectId = p.PersonId and ordv.ObjectReferenceDataTypeId = 25 and ordv.ObjectReferenceDataValueStatusId = 6197 -- estimated best specialty
+                inner join MasterReferenceDataValue mrdv on mrdv.MasterReferenceDataValueId = ordv.MasterReferenceDataValueId
+                inner join PersonLocation pl on pl.PersonId = p.PersonId
+                inner join Location l on l.LocationId = pl.LocationId
+                where l.Zip = '{0}'
+                and mrdv.Value = '{1}'
+            """.format(zip, specialty)
 
+        elif specialty:
+            search_query = """
+                select distinct p.PersonId, p.FirstName, p.LastName, mrdv.Value
+                from Person p
+                inner join ObjectReferenceDataValue ordv on ordv.ObjectId = p.PersonId and ordv.ObjectReferenceDataTypeId = 25 and ordv.ObjectReferenceDataValueStatusId = 6197 -- estimated best specialty
+                inner join MasterReferenceDataValue mrdv on mrdv.MasterReferenceDataValueId = ordv.MasterReferenceDataValueId
+                inner join PersonLocation pl on pl.PersonId = p.PersonId
+                inner join Location l on l.LocationId = pl.LocationId
+                where mrdv.Value = '{0}'
+            """.format(specialty)
+
+        elif zip:
+            search_query = """
+                select distinct p.PersonId, p.FirstName, p.LastName, mrdv.Value
+                from Person p
+                inner join ObjectReferenceDataValue ordv on ordv.ObjectId = p.PersonId and ordv.ObjectReferenceDataTypeId = 25 and ordv.ObjectReferenceDataValueStatusId = 6197 -- estimated best specialty
+                inner join MasterReferenceDataValue mrdv on mrdv.MasterReferenceDataValueId = ordv.MasterReferenceDataValueId
+                inner join PersonLocation pl on pl.PersonId = p.PersonId
+                inner join Location l on l.LocationId = pl.LocationId
+                where l.zip = '{0}'
+            """.format(zip)
+
+        cur = self.conn.cursor()
+        cur.execute(search_query)
+
+        doc_list = []
+        rows = cur.fetchall()
+
+        for row in rows:
+            doc_list.append({
+                    'PersonId': row[0],
+                    'FirstName': row[1],
+                    'LastName': row[2],
+                    'Specialty': row[3]
+                })
+
+        return {'Doctors': doc_list}

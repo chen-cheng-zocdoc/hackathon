@@ -4,6 +4,7 @@ Routes and views for the flask application.
 
 from datetime import datetime
 from flask import render_template
+from flask import request
 from flask.json import jsonify
 from DAPI import app
 from DAPI.persistence.db_doc import DocDB
@@ -40,7 +41,7 @@ def about():
     )
 
 @app.route('/api/doctor/<person_id>')
-def get_doctor(person_id):
+def get_doctor_by_person_id(person_id):
 
     try:
         doc_db = DocDB()
@@ -50,6 +51,21 @@ def get_doctor(person_id):
         print ('Failed to retrieve doctor information.. :(')
 
     return jsonify(doctor)
+
+@app.route('/api/doctor', methods=['GET'])
+def get_doctors():
+
+    specialty = request.args.get('specialty', '')
+    zip = request.args.get('zip', '')
+
+    try:
+        doc_db = DocDB()
+        doctors = doc_db.get_doctor_by_specialty_and_zip(specialty, zip)
+
+    except err:
+        print ('Failed to retrieve doctors.. :(')
+
+    return jsonify(doctors)
 
 @app.route('/api/sellability/<who_id>')
 def get_sellability(who_id):

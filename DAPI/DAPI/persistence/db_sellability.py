@@ -12,8 +12,8 @@ class SellDB(object):
         sellability_query = """
             select si.*
             from SellInfo# si
-            where si.LeadId = '%s'
-        """ % who_id
+            where si.LeadId = '{0}'
+        """.format(who_id)
 
         cur = self.conn.cursor()
         cur.execute(sellability_query)
